@@ -1,0 +1,147 @@
+1. INNER JOIN (внутреннее соединение): Возвращает только те строки, которые имеют совпадающие значения в обеих таблицах.
+LEFT JOIN (или LEFT OUTER JOIN, левое внешнее соединение): Возвращает все строки из левой таблицы и совпадающие строки из правой таблицы. Если совпадение не найдено, возвращаются NULL значения для столбцов из правой таблицы.
+RIGHT JOIN (или RIGHT OUTER JOIN, правое внешнее соединение): Возвращает все строки из правой таблицы и совпадающие строки из левой таблицы. Если совпадение не найдено, возвращаются NULL значения для столбцов из левой таблицы.
+FULL JOIN (или FULL OUTER JOIN, полное внешнее соединение): Возвращает все строки, когда есть совпадение в одной из таблиц. Строки без совпадений в любой из таблиц будут иметь NULL значения для столбцов из другой таблицы.
+Общий синтаксис для выполнения соединений (JOIN) в SQL требует указания столбцов, которые вы хотите выбрать, и применения метода соединения с помощью ключевого слова ON для определения условия соединения.
+example:
+```
+SELECT columns
+FROM table1
+INNER JOIN table2
+ON table1.column = table2.column;
+```
+2. Оператор ALTER TABLE используем для изменения структуры существующей таблшицы. Это позволяет добавлять, изменять и удалять столбцы в таблице.
+Чтобы добавить новый столбец в существующую таблицу, используйте ключевое слово ADD COLUMN.
+```
+ALTER TABLE students
+ADD COLUMN birthdate DATE;
+```
+Для изменения существующего столбца, например, изменения его типа данных, используйте ключевое слово ALTER COLUMN.
+```
+ALTER TABLE students
+ALTER COLUMN birthdate TYPE TIMESTAMP;
+```
+Чтобы удалить столбец из таблицы, используйте ключевое слово DROP COLUMN.
+```
+ALTER TABLE employees
+DROP COLUMN birthdate;
+```
+3. Foreign keys в базах данных используются для связи двух таблиц между собой. Они обеспечивают целостность данных, позволяя определить ссылочную целостность между связанными таблицами. Когда установлено ограничение внешнего ключа, значения в столбце (или столбцах) дочерней таблицы должны существовать в столбце (или столбцах) родительской таблицы.
+Родительская таблица:
+```
+CREATE TABLE departments (
+    department_id SERIAL PRIMARY KEY,
+    department_name VARCHAR(255) NOT NULL
+);
+```
+Дочерняя таблица с внешним ключом:
+```
+CREATE TABLE employees (
+    employee_id SERIAL PRIMARY KEY,
+    employee_name VARCHAR(255) NOT NULL,
+    department_id INT NOT NULL,
+    FOREIGN KEY (department_id) REFERENCES departments (department_id)
+);
+```
+В этом примере в таблице employees столбец department_id является внешним ключом, который ссылается на столбец department_id в таблице departments. Это гарантирует, что каждый сотрудник (строка в таблице employees) будет относиться к существующему отделу (строке в таблице departments), что обеспечивает целостность данных.
+4. 
+1. Пользователь отправляет запрос: Пользователь взаимодействует с интерфейсом вашего веб-приложения, например, нажимает на ссылку или отправляет форму. Браузер создает HTTP-запрос и отправляет его на сервер, где запущено ваше Django-приложение.
+2. URL resolution (Разрешение URL): Django использует файл urls.py, который содержит конфигурацию маршрутов URL, для определения, какое представление (view) должно быть вызвано для обработки запроса. Django ищет совпадение между запрошенным URL и шаблонами URL, определенными в urls.py.
+3. Вызов представления (View): Когда Django определил, какое представление должно обрабатывать запрос, оно вызывает это представление, передавая ему объект запроса (HttpRequest). Представление содержит логику обработки запроса и возвращает объект ответа (HttpResponse) или вызывает другие части приложения для дополнительной обработки.
+4. Обработка запроса в представлении: Внутри представления вы можете выполнить любую необходимую обработку запроса. Это может включать в себя извлечение данных из базы данных, валидацию данных формы, выполнение вычислений и подготовку данных для отображения.
+5. Шаблонизация (опционально): Если ваше представление генерирует HTML-контент для отображения пользователю, оно может использовать систему шаблонов Django для формирования конечного HTML. Шаблоны позволяют вставлять динамические данные в статические HTML-шаблоны.
+6. Формирование ответа: После обработки запроса представление создает объект ответа (HttpResponse). Это может быть HTML-код для отображения пользователю, JSON-данные для использования веб-сервисом или любой другой формат ответа на запрос.
+7. Отправка ответа: Django отправляет сформированный ответ обратно браузеру или клиенту, который инициировал запрос. Ответ содержит данные, которые были подготовлены представлением.
+8. Получение ответа пользователем: Браузер или клиент получает ответ и обрабатывает его. Для HTML-ответов браузер отображает содержимое страницы, а для других типов ответов приложение-клиент обрабатывает данные соответственно.
+9. Завершение цикла запроса/ответа: Цикл запроса/ответа завершается, когда пользователь получает ответ на свой запрос, и дальнейшие действия зависят от контента ответа и поведения пользователя или приложения.
+6. 1.
+```
+ SELECT 
+  Books.title, 
+  COUNT(BorrowingRecords.record_id) AS borrow_count
+FROM 
+  Books
+JOIN
+  BorrowingRecords
+  ON Books.book_id = BorrowingRecords.book_id
+WHERE 
+  BorrowingRecords.borrow_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '6 MONTH')
+GROUP BY 
+  Books.title
+ORDER BY 
+  borrow_count DESC
+LIMIT 1;
+```
+2.
+```
+SELECT 
+  name, 
+  COUNT(record_id) AS borrow_count
+FROM 
+  Members m
+JOIN
+  BorrowingRecords br
+  ON m.member_id = br.member_id
+GROUP BY 
+  name
+ORDER BY 
+  borrow_count DESC
+LIMIT 1;
+```
+3.
+```
+SELECT AVG(return_date - borrow_date) AS average_borrow_duration
+FROM BorrowingRecords
+WHERE return_date IS NOT NULL;
+```
+5. 
+```
+import logging
+import requests
+from telegram import Update
+from telegram.ext import Application, CommandHandler, CallbackContext, MessageHandler, filters
+import os
+import urllib, json
+
+# Enable logging
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+# Define a few command handlers. These usually take the two arguments update and context.
+async def start(update: Update, context: CallbackContext) -> None:
+    await update.message.reply_text('Salom qaysi davlat bayramini bilmoqchisiz?')
+
+async def holiday(update: Update, context: CallbackContext) -> None:
+    country_code = update.message.text
+    url = f'https://calendarific.com/api/v2/holidays?&api_key=nP5EjQWi9KDHNzVOySuULjOKLdgn6oWW&country={country_code}&year=2024'
+
+    response = requests.get(url)
+    response.raise_for_status()  # Raises an HTTPError if the status is 4xx or 5xx
+    data = response.json()
+    # print(data)
+    holidays = data.get('response', {}).get('holidays', [])
+    # print(holidays)
+    if holidays:
+        message = f"Upcoming public holidays in {country_code}:\n"
+        for holiday in holidays:
+            name = holiday.get('name')
+            date = holiday.get('date', {}).get('iso')
+            message += f"{name} on {date}\n"
+        await update.message.reply_text(message)
+
+
+def main() -> None:
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token("6025142350:AAFRs7ikv-EJEsT1WTqE0-MPgH6QBLcPXXc").build()
+    # Add a handler for the /start command
+    application.add_handler(CommandHandler('start', start))
+
+    application.add_handler(MessageHandler(
+        filters=filters.TEXT, callback=holiday))
+
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+if __name__ == '__main__':
+    main()
+```

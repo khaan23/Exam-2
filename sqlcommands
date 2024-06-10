@@ -1,0 +1,40 @@
+6. 1.
+```
+ SELECT 
+  Books.title, 
+  COUNT(BorrowingRecords.record_id) AS borrow_count
+FROM 
+  Books
+JOIN
+  BorrowingRecords
+  ON Books.book_id = BorrowingRecords.book_id
+WHERE 
+  BorrowingRecords.borrow_date >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '6 MONTH')
+GROUP BY 
+  Books.title
+ORDER BY 
+  borrow_count DESC
+LIMIT 1;
+```
+2.
+```
+SELECT 
+  name, 
+  COUNT(record_id) AS borrow_count
+FROM 
+  Members m
+JOIN
+  BorrowingRecords br
+  ON m.member_id = br.member_id
+GROUP BY 
+  name
+ORDER BY 
+  borrow_count DESC
+LIMIT 1;
+```
+3.
+```
+SELECT AVG(return_date - borrow_date) AS average_borrow_duration
+FROM BorrowingRecords
+WHERE return_date IS NOT NULL;
+```
